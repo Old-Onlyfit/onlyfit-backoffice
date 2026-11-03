@@ -5,7 +5,6 @@ import {
   AlignRight,
   Archive,
   Bold,
-  Check,
   ChevronLeft,
   ChevronRight,
   Download,
@@ -43,6 +42,7 @@ import {
   type EmailThread,
 } from '../lib/emailCenter';
 import { isValidEmail, outboundEmailErrorMessage, splitEmailList } from '../lib/outboundEmail';
+import { EmailSyncStatus } from './EmailSyncStatus';
 
 const PAGE_SIZE = 40;
 const MAX_ATTACHMENT_BYTES = 20 * 1024 * 1024;
@@ -385,7 +385,7 @@ export function EmailCenterPage({ initialTo = '' }: { initialTo?: string }) {
   return (
     <>
       <header className="page-header email-page-header">
-        <div><p className="section-label">Comunicação</p><h1>Caixa de e-mail</h1><span>Entrada, envios e respostas das contas @onlyfitapp.com.</span></div>
+        <div><p className="section-label">Comunicação</p><h1>Caixa de e-mail</h1><span>Entrada, envios e respostas das contas @onlyfitapp.com. Use Sincronizar para buscar mensagens novas no provedor.</span></div>
         <div className="header-actions">
           <button className="button secondary" type="button" onClick={refresh} disabled={sync.isPending || threadsQuery.isFetching}><RefreshCw className={sync.isPending || threadsQuery.isFetching ? 'spin' : ''} size={16} /> Sincronizar</button>
           <button className="button primary" type="button" onClick={() => { setComposing(true); setSelectedThreadId(null); }} disabled={!mailboxes.length}><PenLine size={16} /> Novo e-mail</button>
@@ -422,8 +422,7 @@ export function EmailCenterPage({ initialTo = '' }: { initialTo?: string }) {
             {composing ? <div className="email-compose-surface"><EmailComposer mailboxes={mailboxes} initialTo={initialTo} onCancel={() => setComposing(false)} onSent={(threadId) => { setComposing(false); setSelectedThreadId(threadId); void refresh(); }} /></div> : selectedThreadId ? <ThreadDetail key={selectedThreadId} threadId={selectedThreadId} mailboxes={mailboxes} onClose={() => setSelectedThreadId(null)} onSent={refresh} /> : <section className="email-no-selection"><Mail size={30} /><strong>Selecione uma conversa</strong><span>Ou crie um novo e-mail.</span></section>}
           </main>
         </div>
-        {sync.isError && <div className="inline-alert danger"><AlertTriangle size={16} /> A sincronização com o Resend falhou. As mensagens já salvas continuam disponíveis.</div>}
-        {sync.isSuccess && <div className="email-sync-ok" role="status"><Check size={14} /> Sincronização concluída</div>}
+        <EmailSyncStatus failed={sync.isError} errors={sync.isSuccess ? sync.data.errors : null} />
       </section>
     </>
   );

@@ -1,5 +1,5 @@
 import { coreApi } from '../api/core';
-import type { StaffEmailAttachment, StaffEmailMessage, StaffEmailThreadListItem } from '../api/core.gen';
+import type { StaffEmailAttachment, StaffEmailMessage, StaffEmailSyncResult, StaffEmailThreadListItem } from '../api/core.gen';
 
 export type EmailBox = 'all' | 'inbox' | 'sent';
 type EmailDirection = 'inbound' | 'outbound';
@@ -155,8 +155,8 @@ export async function markEmailThreadRead(id: string): Promise<void> {
   await coreApi.staff.emailThreadRead({ threadId: id, idempotencyKey: crypto.randomUUID() });
 }
 
-export async function syncEmailCenter(): Promise<void> {
-  await coreApi.staff.emailSync({ idempotencyKey: crypto.randomUUID() });
+export async function syncEmailCenter(): Promise<StaffEmailSyncResult> {
+  return coreApi.staff.emailSync({ idempotencyKey: crypto.randomUUID() });
 }
 
 export async function openEmailAttachment(id: string): Promise<void> {
